@@ -6,14 +6,18 @@
 //
 
 import SwiftUI
+import Firebase
 
 @main
 struct GraphVApp: App {
+    init(){
+        FirebaseApp.configure()
+    }
+    
     var body: some Scene {
         WindowGroup {
-            MainScreenView()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.white)
+            OriginView()
+                .environmentObject(AuthenticationViewModel())
         }
     }
 }

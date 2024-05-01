@@ -77,6 +77,19 @@ struct SignUpView: View {
                 .cornerRadius(25)
                 .padding()
                 
+                Text("--- OR ---")
+                
+                Text("Sign Up with")
+                
+                Button(
+                    action: {
+                        //
+                    } ,
+                    label: {
+                        Text("Sign Up with Google")
+                    })
+                
+                
                 Button(
                     action: {
                         showSheet = true

@@ -8,6 +8,8 @@
 import Foundation
 import Firebase
 import FirebaseFirestore
+import GoogleSignIn
+import GoogleSignInSwift
 
 class AuthenticationViewModel: ObservableObject {
     let db = Firestore.firestore()
@@ -48,11 +50,12 @@ class AuthenticationViewModel: ObservableObject {
     func signIn() async {
         Auth.auth().createUser(withEmail: email, password: password) { result, error in
             if let error = error {
-                self.signInError = "\(error.localizedDescription)"
+                DispatchQueue.main.async {
+                    self.signInError = "\(error.localizedDescription)"
+                }
             } else {
                 guard let user = Auth.auth().currentUser else { return }
-                
-                print("ID = ", self.userID)
+            
                 let userData = User(id: result?.user.uid ?? "", email: self.email, username: self.username, dateOfBirth: self.dateOfBirth, userNotes: self.userNotes)
                 
                 self.storeUserData(userData)
@@ -65,12 +68,16 @@ class AuthenticationViewModel: ObservableObject {
     func logIn () async {
         Auth.auth().signIn(withEmail: email, password: password){ result, error in
             if(error != nil){
-                self.logInError = "\(error!.localizedDescription)"
+                DispatchQueue.main.async {
+                    self.logInError = "\(error!.localizedDescription)"
+                }
                 print(self.logInError)
             }
             
             guard let user = result?.user else {
-                self.logInError = "Invalid Credentials"
+                DispatchQueue.main.async {
+                    self.logInError = "Invalid Credentials"
+                }
                 print(self.logInError)
                 return
             }
@@ -78,14 +85,18 @@ class AuthenticationViewModel: ObservableObject {
             let userDocumentRef = self.db.collection("users").whereField("email", isEqualTo: self.email)
 
             userDocumentRef.getDocuments { (document, error) in
-                if let error = error {
-                    self.logInError = "Error retrieving document: \(error.localizedDescription)"
+                DispatchQueue.main.async {
+                    if let error = error {
+                        self.logInError = "Error retrieving document: \(error.localizedDescription)"
+                    }
                     print(self.logInError)
                     return
                 }
                 
                 guard let documents = document?.documents else {
-                    self.logInError = "Document data was empty"
+                    DispatchQueue.main.async {
+                        self.logInError = "Document data was empty"
+                    }
                     print(self.logInError)
                     return
                 }
@@ -94,18 +105,21 @@ class AuthenticationViewModel: ObservableObject {
                 
                 let documentData = documents.first!
                 
-                self.username = documentData["username"] as? String ?? ""
-                self.email = documentData["email"] as? String ?? ""
-                if let timestamp = documentData["dateOfBirth"] as? Timestamp {
-                    self.dateOfBirth = timestamp.dateValue()
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "MMMM dd, yyyy"
-                    let formattedDate = dateFormatter.string(from: self.dateOfBirth)
-                    //self.dateOfBirth = Date(formattedDate)
-                } else {
-                    self.dateOfBirth = Date()
+                DispatchQueue.main.async {
+                    self.username = documentData["username"] as? String ?? ""
+                    self.email = documentData["email"] as? String ?? ""
+                    if let timestamp = documentData["dateOfBirth"] as? Timestamp {
+                        self.dateOfBirth = timestamp.dateValue()
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "MMMM dd, yyyy"
+                        let formattedDate = dateFormatter.string(from: self.dateOfBirth)
+                        //self.dateOfBirth = Date(formattedDate)
+                    }
+                    else {
+                        self.dateOfBirth = Date()
+                    }
+                    self.userNotes = documentData["userNotes"] as? String ?? ""
                 }
-                self.userNotes = documentData["userNotes"] as? String ?? ""
                 
 //                self.isSignedIn = true
                 print("login successful")
@@ -124,15 +138,19 @@ class AuthenticationViewModel: ObservableObject {
 
         userQuery.getDocuments { (querySnapshot, error) in
             if let error = error {
-                self.updateMsg = "Error fetching documents: \(error)"
-                self.updateSuccess = false
+                DispatchQueue.main.async {
+                    self.updateMsg = "Error fetching documents: \(error)"
+                    self.updateSuccess = false
+                }
                 print("updateMsg = \(self.updateMsg)")
                 return
             }
 
             guard let documents = querySnapshot?.documents else {
-                self.updateMsg = "No documents found"
-                self.updateSuccess = false
+                DispatchQueue.main.async {
+                    self.updateMsg = "No documents found"
+                    self.updateSuccess = false
+                }
                 print("updateMsg = \(self.updateMsg)")
                 return
             }
@@ -141,12 +159,16 @@ class AuthenticationViewModel: ObservableObject {
                 let documentRef = document.reference
                 documentRef.updateData(newData) { error in
                     if let error = error {
-                        self.updateMsg = "Error updating document: \(error)"
-                        self.updateSuccess = false
+                        DispatchQueue.main.async {
+                            self.updateMsg = "Error updating document: \(error)"
+                            self.updateSuccess = false
+                        }
                         print("updateMsg = \(self.updateMsg)")
                     } else {
-                        self.updateMsg = "Saved!"
-                        self.updateSuccess = true
+                        DispatchQueue.main.async {
+                            self.updateMsg = "Saved!"
+                            self.updateSuccess = true
+                        }
                         print("updateMsg = \(self.updateMsg)")
                     }
                 }
@@ -158,22 +180,117 @@ class AuthenticationViewModel: ObservableObject {
         do {
             try Auth.auth().signOut()
             
-            userID = ""
-            username = ""
-            email = ""
-            password = ""
-            dateOfBirth = Date()
-            userNotes = ""
-            
-            isSignedIn = false
-            
-            signInError = ""
-            logInError = ""
-            updateMsg = ""
-            updateSuccess = false
+            DispatchQueue.main.async {
+                self.userID = ""
+                self.username = ""
+                self.email = ""
+                self.password = ""
+                self.dateOfBirth = Date()
+                self.userNotes = ""
+                
+                self.isSignedIn = false
+                
+                self.signInError = ""
+                self.logInError = ""
+                self.updateMsg = ""
+                self.updateSuccess = false
+            }
         }
         catch let signOutError as NSError {
-            self.signOutError = "Error signing out: \(signOutError.localizedDescription)"
+            DispatchQueue.main.async {
+                self.signOutError = "Error signing out: \(signOutError.localizedDescription)"
+            }
         }
     }
+    
+    func signInWithGoogle() async -> Bool {
+        guard let clientID = FirebaseApp.app()?.options.clientID else {
+          fatalError("No client ID found in Firebase configuration")
+        }
+        let config = GIDConfiguration(clientID: clientID)
+        GIDSignIn.sharedInstance.configuration = config
+
+        guard let windowScene = await UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = await windowScene.windows.first,
+              let rootViewController = await window.rootViewController else {
+          print("There is no root view controller!")
+          return false
+        }
+    
+        do {
+            let userAuthentication = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
+            let user = userAuthentication.user
+            guard let idToken = user.idToken else { return false }
+            let accessToken = user.accessToken
+            let credential = GoogleAuthProvider.credential(withIDToken: idToken.tokenString,accessToken: accessToken.tokenString)
+
+            let result = try await Auth.auth().signIn(with: credential)
+            let firebaseUser = result.user
+            
+            print("User \(firebaseUser.uid) signed in with email \(firebaseUser.email ?? "unknown")")
+              
+            guard let user = Auth.auth().currentUser else { return false }
+            
+            DispatchQueue.main.async {
+                self.email = user.email ?? ""
+            }
+            
+            print(self.email)
+            
+            print("getting document")
+            let userDocumentRef = self.db.collection("users").whereField("email", isEqualTo: self.email)
+            print("got userDocumentRef")
+            
+            userDocumentRef.getDocuments { (document, error) in
+                print("getting getDocuments")
+                if let error = error {
+                    self.logInError = "Error retrieving document: \(error.localizedDescription)"
+                    print(self.logInError)
+                    return
+                }
+                
+                print("no error")
+                
+                if let documents = document?.documents, !documents.isEmpty {
+                    let documentData = documents.first!
+                    DispatchQueue.main.async {
+                        self.username = documentData["username"] as? String ?? ""
+//                        self.email = documentData["email"] as? String ?? ""
+                        if let timestamp = documentData["dateOfBirth"] as? Timestamp {
+                            self.dateOfBirth = timestamp.dateValue()
+                            let dateFormatter = DateFormatter()
+                            dateFormatter.dateFormat = "MMMM dd, yyyy"
+                            let formattedDate = dateFormatter.string(from: self.dateOfBirth)
+                            //self.dateOfBirth = Date(formattedDate)
+                        } else {
+                            self.dateOfBirth = Date()
+                        }
+                        self.userNotes = documentData["userNotes"] as? String ?? ""
+                    }
+//                    self.logInError = "Document data was empty"
+//                    print(self.logInError)
+//                    return
+                }
+                else{
+                    let userData = User(id: result.user.uid ?? "", email: self.email, username: self.username, dateOfBirth: self.dateOfBirth, userNotes: self.userNotes)
+                    
+                    self.storeUserData(userData)
+                    print("Registration successful")
+                }
+                
+//                if documents.isEmpty { return }
+                
+//                let documentData = documents.first!
+                
+//                self.isSignedIn = true
+                print("login successful")
+            }
+                
+                return true
+          }
+          catch {
+            signInError = error.localizedDescription
+            return false
+          }
+      }
 }

@@ -3,3 +3,6 @@
 *.resolved
 *.xcuserstate
 GraphV.xcworkspace/xcuserdata/ameyakale.xcuserdatad/xcschemes/xcschememanagement.plist
+.DS_Store
+GraphV.xcodeproj/xcuserdata/ameyakale.xcuserdatad/xcschemes/xcschememanagement.plist
+GraphV.xcworkspace/xcuserdata/ameyakale.xcuserdatad/UserInterfaceState.xcuserstate

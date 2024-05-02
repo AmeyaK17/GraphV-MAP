@@ -22,7 +22,7 @@ struct OriginView: View {
     }
 }
 
-#Preview {
-    OriginView()
-        .environmentObject(AuthenticationViewModel())
-}
+//#Preview {
+//    OriginView()
+//        .environmentObject(AuthenticationViewModel())
+//}

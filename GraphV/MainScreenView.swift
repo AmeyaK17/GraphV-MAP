@@ -51,7 +51,7 @@ struct MainScreenView: View {
     }
 }
 
-#Preview {
-    MainScreenView()
-        .environmentObject(AuthenticationViewModel())
-}
+//#Preview {
+//    MainScreenView()
+//        .environmentObject(AuthenticationViewModel())
+//}

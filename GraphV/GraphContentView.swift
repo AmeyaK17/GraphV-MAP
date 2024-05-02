@@ -32,6 +32,11 @@ struct GraphContentView: View {
                         .animation(.interpolatingSpring(stiffness: 50, damping: 8), value: node.position)
                         .animation(.easeInOut)
                         .shadow(radius: 10)
+//                        .onChange(of: graphViewModel.visitedNodes) { _ in
+//                            if graphViewModel.visitedNodes.contains(node.id) {
+//                                graphViewModel.audioPlayer?.play()
+//                            }
+//                        }
                         .gesture(DragGesture()
                             .onChanged { value in
                                     if startPoint == .zero {

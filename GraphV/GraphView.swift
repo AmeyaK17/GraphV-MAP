@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct GraphView: View {
+struct GraphView: View {    
     @StateObject var graphViewModel = GraphViewModel()
     @State private var startPoint: CGPoint = .zero
     @State private var selectedNode: Node? = nil

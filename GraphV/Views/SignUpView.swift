@@ -24,7 +24,7 @@ struct SignUpView: View {
                 
                 Image(systemName: "person.fill.badge.plus")
                     .resizable()
-                    .frame(width: 100, height: 100)
+                    .frame(width: 80, height: 80)
                     .foregroundColor(.gray)
 //                    .shadow(color: .gray,radius: /*@START_MENU_TOKEN@*/10/*@END_MENU_TOKEN@*/)
                 
@@ -77,16 +77,32 @@ struct SignUpView: View {
                 .cornerRadius(25)
                 .padding()
                 
-                Text("--- OR ---")
-                
-                Text("Sign Up with")
+                HStack {
+                    VStack { Divider().background(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/) }
+                    Text("or")
+                    VStack { Divider().background(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/) }
+              }
                 
                 Button(
                     action: {
-                        //
+                        Task{
+                            authenticationViewModel.isSignedIn = await authenticationViewModel.signInWithGoogle()
+                        }
                     } ,
                     label: {
-                        Text("Sign Up with Google")
+                        HStack{
+                            Image("Google")
+                                .resizable()
+                                .scaledToFit()
+                            Text("Sign Up with Google")
+                                .foregroundStyle(.blue)
+                                .fontWeight(.bold)
+                        }
+                        .frame(width: 300, height: 50)
+                        .background(.white)
+                        .cornerRadius(25)
+                        .padding()
+                        
                     })
                 
                 

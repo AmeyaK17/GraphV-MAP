@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import AVFAudio
 
 class GraphViewModel: ObservableObject {
     var graphModel = GraphModel.sharedInstance
@@ -20,6 +21,8 @@ class GraphViewModel: ObservableObject {
     @Published var sourceNode: Node? = nil
     @Published var destinationNode: Node? = nil
     @Published var visitedNodes: Set<Int> = []
+    
+    var audioPlayer: AVAudioPlayer?
     
     @Published var nodeValue = 0
     @Published var traversalOptions = ["BFS", "DFS"]
@@ -38,6 +41,21 @@ class GraphViewModel: ObservableObject {
                 break
             }
         }
+    }
+    
+    func playAudio (fileName: String) {
+        if let soundURL = Bundle.main.url(forResource: fileName, withExtension: "mp3") {
+            do {
+                audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
+            } catch {
+                print("Error loading sound file: \(error.localizedDescription)")
+                audioPlayer = nil
+            }
+        } else {
+            audioPlayer = nil
+        }
+        
+        audioPlayer?.play()
     }
     
     @Published var showAlert = false
@@ -79,6 +97,7 @@ class GraphViewModel: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             // Ensure UI updates are done on the main thread
             DispatchQueue.main.async {
+                self.playAudio(fileName: "moan-short")
                 self.visitedNodes.insert(nodeID)
             }
         }
@@ -90,7 +109,7 @@ class GraphViewModel: ObservableObject {
             return false
         }
         
-        var delay = 1.0
+        var delay = 0.0
         print(adjacencyList)
         
         visitedNodes.removeAll()
@@ -102,12 +121,19 @@ class GraphViewModel: ObservableObject {
             
             if let currNode = nodes[currNodeID]{
                 processNodeDelay(nodeID: currNodeID, delay: delay)
-                delay += 1.0
+                delay += 2.0
                 
                 visitedNodesForBFS.insert(currNode.id)
     
                 print("currNode = \(currNode.val)")
                 if currNode.id == destination.id{
+                    DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                        // Ensure UI updates are done on the main thread
+                        DispatchQueue.main.async {
+                            self.playAudio(fileName: "ahh-satisfied")
+//                            self.visitedNodes.insert(nodeID)
+                        }
+                    }
                     return true
                 }
                 
@@ -122,16 +148,29 @@ class GraphViewModel: ObservableObject {
             }
         }
         
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            // Ensure UI updates are done on the main thread
+            DispatchQueue.main.async {
+                self.playAudio(fileName: "ahh-satisfied")
+            }
+        }
         return false
     }
     
     func dfs(from currNode: Int, to destination: Node, visitedNodesForDFS: inout Set<Int>, delay delay: inout Double) -> Bool{
         
-        delay += 1.0
+        delay += 2.0
         processNodeDelay(nodeID: currNode, delay: delay)
         visitedNodesForDFS.insert(currNode)
         
         if currNode == destination.id{
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                // Ensure UI updates are done on the main thread
+                DispatchQueue.main.async {
+                    self.playAudio(fileName: "ahh-satisfied")
+//                            self.visitedNodes.insert(nodeID)
+                }
+            }
             return true
         }
         
@@ -165,6 +204,14 @@ class GraphViewModel: ObservableObject {
         
         let res = dfs(from: source.id, to: destination, visitedNodesForDFS: &visitedNodesForDFS, delay: &delay)
         print(res)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            // Ensure UI updates are done on the main thread
+            DispatchQueue.main.async {
+                self.playAudio(fileName: "ahh-satisfied")
+//                            self.visitedNodes.insert(nodeID)
+            }
+        }
         
         return res
     }

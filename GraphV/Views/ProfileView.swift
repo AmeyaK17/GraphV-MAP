@@ -160,15 +160,14 @@ struct ProfileView: View {
                     .foregroundStyle(.orange)
                     .padding()
                 }
-                
-                Spacer()
+//                Spacer()
             }
         }
 
     }
 }
 
-#Preview {
-    ProfileView()
-        .environmentObject(AuthenticationViewModel())
-}
+//#Preview {
+//    ProfileView()
+//        .environmentObject(AuthenticationViewModel())
+//}

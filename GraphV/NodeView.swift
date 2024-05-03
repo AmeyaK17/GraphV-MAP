@@ -21,6 +21,6 @@ struct NodeView: View {
     }
 }
 
-#Preview {
-    NodeView(node: Node(val: 5, position: CGPoint(x: 40, y: 750)))
-}
+//#Preview {
+//    NodeView(node: Node(val: 5, position: CGPoint(x: 40, y: 750)))
+//}
